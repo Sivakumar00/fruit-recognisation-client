@@ -1,155 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <title>Clarifai JavaScript Stater</title>
-  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-  <script type="text/javascript" src="predict.js"></script>
-  <script type="text/javascript" src="keys.js"></script>
-  <script type="text/javascript" src="https://sdk.clarifai.com/js/clarifai-latest.js"></script>
-  <script>
-  try {
-    var app = new Clarifai.App({
-     apiKey: myApiKey
-    });
-  }
-  catch(err) {
-    alert("Need a valid API Key!");
-    throw "Invalid API Key";
-  }
-  
-  // Checks for valid image type
-  function validFile(imageName) {
-    var lowerImageName = imageName.toLowerCase();
-    return lowerImageName.search(/jpg|png|bmp|tiff/gi) != -1;
-  }
-  
-  // Fills custom model dropdown
-  window.onload = function() {
-    var select = document.getElementById("custom_models_dropdown");
-    
-    app.models.list().then(
-      function(response) {
-        var ids = response.rawData;
-        
-        for(var i=0; i < ids.length; i++) {
-          var model = ids[i];
-          if(model.app_id != "main") {
-            var el = document.createElement("option");
-            el.textContent = model.name;
-            el.value = model.id;
-            select.appendChild(el);
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Fruit Identifier</title>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="predict.js"></script>
+    <script type="text/javascript" src="keys.js"></script>
+    <script
+      type="text/javascript"
+      src="https://sdk.clarifai.com/js/clarifai-latest.js"
+    ></script>
+    <div id="Title" style="font-size:48px; font-family :Arial; margin-bottom:20px; color:#0450d4">
+      Fruit Identification
+    </div>
+    <script>
+      try {
+        var app = new Clarifai.App({
+          apiKey: myApiKey
+        });
+      } catch (err) {
+        alert("Need a valid API Key!");
+        throw "Invalid API Key";
+      }
+
+      // Checks for valid image type
+      function validFile(imageName) {
+        var lowerImageName = imageName.toLowerCase();
+        return lowerImageName.search(/jpg|png|bmp|tiff/gi) != -1;
+      }
+
+      // Fills custom model dropdown
+      window.onload = function() {
+        var select = document.getElementById("custom_models_dropdown");
+
+        app.models.list().then(
+          function(response) {
+            var ids = response.rawData;
+
+            for (var i = 0; i < ids.length; i++) {
+              var model = ids[i];
+              if (model.app_id != "main") {
+                var el = document.createElement("option");
+                el.textContent = model.name;
+                el.value = model.id;
+                select.appendChild(el);
+              }
+            }
+          },
+          function(err) {
+            alert(err);
           }
-        }
-      },
-      function(err) {
-        alert(err);
+        );
+      };
+    </script>
+
+    <style type="text/css">
+      body {
+        margin-left: 20px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+        font-family: sans-serif;
+        height: 100%;
       }
-    );
-  }
-  </script>
-  
-  <style type="text/css">
-    body { margin-left:20px; margin-top:20px; margin-bottom:30px; font-family: sans-serif; height:100%}
-    ul {
-      list-style: none;
-      margin: 30px 0 0 0;
-      padding: 0;
-      columns: 1;
-      -webkit-columns: 1;
-      -moz-columns: 1;
-      overflow:auto;
-    }
-    li {
-      box-shadow: 0 0 0 2px #546578 inset;
-      margin: 0 0 5px 0;
-      border-radius: 16px;
-      line-height: 28px;
-      padding: 2px 15px;
-      font-weight: 500;
-      font-size: 15px;
-      color: #2E4157;
-    }
-    ul li i{
-      font-family: "Lucida Console", Courier, monospace;
-      font-style: normal;
-      font-size: 14px;
-    }
-    
-    .conceptBox {
-      float:left; 
-      margin-left:40px; 
-      margin-top:15px;
-      margin-bottom:30px;
-      height:100%;
-    }
-  </style>
-</head>
-<body>
-  <div id="Title" style="font-size:48px; font-face:Arial; margin-bottom:20px;"><img src="Clarifai_Logo.png" id="logo"/>&nbsp;Model Tester!</div>
-  <div id="Model_Title" style="font-size:16px; margin-bottom:5px">Model</div>
-  <input type="hidden" id="hidden-counter" name="hidden-counter" value="1"/>
-  <form action="" style="font-size:14px; margin-bottom:20px; float:left; margin-right:30px;">
-    <input type="radio" name="model" value="general" checked="checked"> General<br>
-    <input type="radio" name="model" value="food"> Food<br>
-    <input type="radio" name="model" value="NSFW"> NSFW<br>
-    <input type="radio" name="model" value="travel"> Travel<br>
-    <input type="radio" name="model" value="wedding"> Wedding<br>
-    <input type="radio" name="model" value="color"> Color<br>
-    <input type="radio" name="model" value="apparel"> Apparel<br>
-    <input type="radio" name="model" value="faces"> Faces<br>
-    <input type="radio" name="model" value="demographic"> Demographic<br>
-    <input type="radio" name="model" value="celebrity"> Celebrity<br>
-    <input type="radio" name="model" value="logo"> Logo<br>
-    <input type="radio" name="model" value="focus"> Focus<br>
-    <input type="radio" name="model" value="moderation"> Moderation<br>
-    <input type="radio" name="model" value="portrait"> Portrait Quality<br>
-    <input type="radio" name="model" value="landscape"> Landscape Quality<br>
-    <input type="radio" name="model" value="texturespatterns"> Textures & Patterns<br>
-    <input type="radio" name="model" value="custom"> Custom &nbsp;<select id="custom_models_dropdown"></select><br>
-  </form>
-  <div style="float:left">
-    <button onclick="
-      if(imgurl.value == '') { 
-        alert('Please enter an image URL!'); 
-        return;
-      } 
-    
-      else if (!validFile(imgurl.value)) {
-        alert('Supported File Types: JPEG, PNG, TIFF, BMP');
-        return;
+      ul {
+        list-style: none;
+        margin: 30px 0 0 0;
+        padding: 0;
+        columns: 1;
+        -webkit-columns: 1;
+        -moz-columns: 1;
+        overflow: auto;
       }
-    
-      predict_click($('#imgurl').val(), 'url');" style="width:112px">Predict a URL!</button>
-    
-    <input type="text" id="imgurl" placeholder="Image URL" size="80"/>
-    
-    <br/><br/>
-    
-    <button onclick="
-      if(filename.value == '') { 
-        alert('Please browse for a file!'); 
-        return;
-      } 
-    
-      else if (!validFile(filename.value)) {
-        alert('Supported File Types: JPEG, PNG, TIFF, BMP');
-        return;
+      li {
+        box-shadow: 0 0 0 2px #546578 inset;
+        margin: 0 0 5px 0;
+        border-radius: 16px;
+        line-height: 28px;
+        padding: 2px 15px;
+        font-weight: 500;
+        font-size: 15px;
+        color: #2e4157;
       }
-      predict_click($('#filename').val(), 'file');">Predict a local file!</button>
-    
-    <input type="file" id="filename" placeholder="Filename" size="80"/>
-  </div>
-  
-  <div id="predictions">
-    <div style="margin-top:30px; margin-left:20px; margin-bottom:30px; clear:left; float:left">
-      <img id="img_preview1" src="" width="400"/>
-      <br/>
-      <span id="add-image-button" style="visibility:hidden"><button onClick="addImageToApp(1)">Add image to application</button></span>
+      ul li i {
+        font-family: "Lucida Console", Courier, monospace;
+        font-style: normal;
+        font-size: 14px;
+      }
+
+      .conceptBox {
+        float: left;
+        margin-left: 40px;
+        margin-top: 15px;
+        margin-bottom: 30px;
+        height: 100%;
+      }
+      #my_camera {
+        width: 320px;
+        height: 240px;
+        border: 1px solid black;
+      }
+      .column {
+        float: left;
+        width: 40%;
+      }
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+      input[type=button] {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="row">
+      <div class="column">
+          <input type="hidden" id="hidden-counter" name="hidden-counter" value="1" />
+
+        <div id="my_camera"></div>
+        <br/>
+        <input type="button"  value="Find the fruit" onClick="take_snapshot()" />
+        <br/>
+        <br/>
+        <div id="results">
+        </div>
+        <form action="" style="font-size:14px; margin-bottom:20px; float:left; margin-right:30px;">
+          <input type="radio" name="model" value="food" checked="checked" style="display:none"> </input>
+          <br />
+        </form>
+      </div>
+      <div class="column">
+        <div id="predictions">
+          <div
+            style="margin-top:30px; margin-left:20px; margin-bottom:30px; clear:left; float:left"
+          >
+            <img id="img_preview1" src="" width="400" />
+            <br />
+          </div>
+          <div id="concepts" class="conceptBox"></div>
+        </div>
+      </div>
     </div>
-    <div id="concepts" class="conceptBox">
-    </div>
-  </div>
+
+    <script type="text/javascript" src="webcamjs/webcam.min.js"></script>
+
+    <script language="JavaScript">
+      Webcam.set({
+        width: 450,
+        height: 360,
+        image_format: "jpeg",
+        jpeg_quality: 90
+      });
+      Webcam.attach("#my_camera");
+      function take_snapshot() {
+        // take snapshot and get image data
+        Webcam.snap(function(data_uri) {
+          // display results in page
+          console.log(data_uri);
+          // download(data_uri,"image.jpeg","image/jpeg");
   
-</body>
+          fetch(data_uri).then(function (t) {
+            return t.blob().then((b) => {
+              var file = new File([b], "imsg.jpeg", { type: "image/jpeg", lastModified: Date.now() });
+              console.log('file created')
+              predict_click(file,"file");
+
+            }
+            );
+          });
+         
+        });
+      }
+    </script>
+  </body>
 </html>

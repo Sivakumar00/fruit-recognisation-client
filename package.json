@@ -1,9 +1,10 @@
 {
-  "name": "javascript-starter",
+  "name": "fruit-identifier",
   "version": "1.0.0",
-  "description": "Clarifai V2 JavaScript Starter",
+  "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
